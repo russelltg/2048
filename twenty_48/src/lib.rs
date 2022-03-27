@@ -1,28 +1,24 @@
 #![feature(const_option, int_log)]
 
+pub mod solvers;
+
 use std::{
     fmt::{self, Display},
-    io::stdout,
+    io::{stdin, stdout, Read},
     num::NonZeroU32,
 };
 
-use crossterm::{
-    event::{read, Event, KeyCode, KeyModifiers},
-    style::{Color, Print, Stylize},
-    terminal::{disable_raw_mode, enable_raw_mode},
-    Command, ExecutableCommand,
-};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use rand_distr::{Distribution, Standard, Uniform};
 
 #[derive(Clone)]
-struct GameState {
+pub struct GameState {
     nums: [Option<Tile>; 16],
     rng: StdRng,
 }
 
 #[derive(Debug, Copy, Clone)]
-enum Direction {
+pub enum Direction {
     Up,
     Down,
     Left,
@@ -52,11 +48,11 @@ fn movable<'a>(mut iter: impl Iterator<Item = &'a Option<Tile>>) -> bool {
 }
 
 impl GameState {
-    fn new_from_seed(seed: u64) -> Self {
+    pub fn new_from_seed(seed: u64) -> Self {
         Self::new(StdRng::seed_from_u64(seed))
     }
 
-    fn new_from_entropy() -> Self {
+    pub fn new_from_entropy() -> Self {
         Self::new(StdRng::from_entropy())
     }
 
@@ -72,16 +68,16 @@ impl GameState {
         s
     }
 
-    fn spawn_tile(&mut self) {
+    pub fn spawn_tile(&mut self) {
         let t = self.random_open_tile().unwrap();
         self.nums[t] = Some(self.rng.gen())
     }
 
-    fn lost(&self) -> bool {
+    pub fn lost(&self) -> bool {
         Direction::ALL.iter().all(|d| !self.can_move(*d))
     }
 
-    fn rows(&self) -> [[Option<Tile>; 4]; 4] {
+    pub fn rows(&self) -> [[Option<Tile>; 4]; 4] {
         [
             self.nums[0..4].try_into().unwrap(),
             self.nums[4..8].try_into().unwrap(),
@@ -109,13 +105,15 @@ impl GameState {
     //     [[a, d, g], [b, e, h], [c, f, i]]
     // }
 
-    fn can_move(&self, direction: Direction) -> bool {
-        // match direction {
-        //     Direction::Up => self.cols().iter().any(|col| movable(col.iter())),
-        //     Direction::Down => self.cols().iter().any(|col| movable(col.iter().rev())),
-        //     Direction::Left => self.rows().iter().any(|col| movable(col.iter())),
-        //     Direction::Right => self.rows().iter().any(|col| movable(col.iter().rev())),
-        // }
+    pub fn can_move_col(&self, column: i32) -> bool {
+        self.can_move_colrow(column, Direction::Up) || self.can_move_colrow(column, Direction::Down)
+    }
+
+    pub fn can_move_row(&self, row: i32) -> bool {
+        self.can_move_colrow(row, Direction::Left) || self.can_move_colrow(row, Direction::Right)
+    }
+
+    pub fn can_move_colrow(&self, colrow: i32, direction: Direction) -> bool {
         let (dperp, dpar, start): (i32, i32, i32) = match direction {
             Direction::Up => (4, 1, 0),
             Direction::Down => (-4, 1, 12),
@@ -123,29 +121,59 @@ impl GameState {
             Direction::Right => (-1, 4, 3),
         };
 
-        for par_idx in 0..4 {
-            let s = start + par_idx * dpar;
-            for perp_idx in 0..3 {
-                let idx = s + perp_idx * dperp;
+        let s = start + colrow * dpar;
+        for perp_idx in 0..3 {
+            let idx = s + perp_idx * dperp;
 
-                for seekidx in 1..4 - perp_idx {
-                    let n = (idx + seekidx * dperp) as usize;
-                    if self.nums[n].is_some() {
-                        if self.nums[idx as usize] == self.nums[n] {
-                            return true;
-                        } else if self.nums[idx as usize].is_none() {
-                            return true;
-                        } else {
-                            break; // something in the way
-                        }
+            for seekidx in 1..4 - perp_idx {
+                let n = (idx + seekidx * dperp) as usize;
+                if self.nums[n].is_some() {
+                    if self.nums[idx as usize] == self.nums[n] {
+                        return true;
+                    } else if self.nums[idx as usize].is_none() {
+                        return true;
+                    } else {
+                        break; // something in the way
                     }
                 }
             }
         }
-        return false;
+        false
     }
 
-    fn do_move(&mut self, direction: Direction) {
+    pub fn can_move(&self, direction: Direction) -> bool {
+        (0..4).any(|colrow| self.can_move_colrow(colrow, direction))
+
+        // let (dperp, dpar, start): (i32, i32, i32) = match direction {
+        //     Direction::Up => (4, 1, 0),
+        //     Direction::Down => (-4, 1, 12),
+        //     Direction::Left => (1, 4, 0),
+        //     Direction::Right => (-1, 4, 3),
+        // };
+
+        // for par_idx in 0..4 {
+        //     let s = start + par_idx * dpar;
+        //     for perp_idx in 0..3 {
+        //         let idx = s + perp_idx * dperp;
+
+        //         for seekidx in 1..4 - perp_idx {
+        //             let n = (idx + seekidx * dperp) as usize;
+        //             if self.nums[n].is_some() {
+        //                 if self.nums[idx as usize] == self.nums[n] {
+        //                     return true;
+        //                 } else if self.nums[idx as usize].is_none() {
+        //                     return true;
+        //                 } else {
+        //                     break; // something in the way
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        // false
+    }
+
+    pub fn do_move(&mut self, direction: Direction) {
         let (dperp, dpar, start): (i32, i32, i32) = match direction {
             Direction::Up => (4, 1, 0),
             Direction::Down => (-4, 1, 12),
@@ -208,18 +236,34 @@ impl GameState {
             rng: StdRng::from_entropy(),
         }
     }
+
+    pub fn max(&self) -> u32 {
+        self.nums
+            .iter()
+            .filter_map(|t| t.map(|t| t.as_u32()))
+            .max()
+            .unwrap()
+    }
+
+    pub fn print(&self) {
+        println!("{self}");
+    }
+    fn print_row(f: &mut impl fmt::Write, row: &[Option<Tile>]) -> fmt::Result {
+        for tile in row.iter() {
+            match tile {
+                Some(tile) => write!(f, "|{: ^5}", tile.as_u32())?,
+                None => write!(f, "|{: ^5}", " ")?,
+            }
+        }
+        Ok(())
+    }
 }
 
-impl Command for GameState {
-    fn write_ansi(&self, f: &mut impl fmt::Write) -> fmt::Result {
+impl Display for GameState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for row in self.rows().iter() {
-            for tile in row.iter() {
-                match tile {
-                    Some(tile) => write!(f, "|{: ^5}", tile.styled())?,
-                    None => write!(f, "|{: ^5}", " ")?,
-                }
-            }
-            write!(f, "|\r\n")?;
+            GameState::print_row(f, row)?;
+            write!(f, "|\n")?;
         }
         Ok(())
     }
@@ -227,7 +271,8 @@ impl Command for GameState {
 
 // which power of two. NonZero because two is the lowest
 #[derive(Copy, Clone, PartialEq, Eq)]
-struct Tile(NonZeroU32);
+// #[cfg_attr(feature = "yew", derive(yew::ImplicitClone))]
+pub struct Tile(NonZeroU32);
 
 impl Tile {
     const TWO: Tile = Tile(NonZeroU32::new(1).unwrap());
@@ -237,24 +282,12 @@ impl Tile {
         Tile(NonZeroU32::new(self.0.get() + 1).unwrap())
     }
 
-    fn as_u32(&self) -> u32 {
+    pub fn as_u32(&self) -> u32 {
         2_u32.pow(self.0.get())
     }
 
-    fn styled(&self) -> impl Display {
-        format!("{: ^5}", self.as_u32()).with(match self.as_u32() {
-            2 => Color::White,
-            4 => Color::Rgb {
-                r: 255,
-                g: 215,
-                b: 0,
-            }, // orange
-            8 => Color::DarkYellow,
-            16 => Color::Magenta,
-            32 => Color::Green,
-            64 => Color::Blue,
-            _ => Color::White,
-        })
+    pub fn exponent(&self) -> u32 {
+        self.0.get()
     }
 }
 
@@ -266,59 +299,6 @@ impl Distribution<Tile> for Standard {
             Tile::FOUR
         }
     }
-}
-
-fn main() {
-    let mut game = GameState::new_from_entropy();
-    let mut prev_state = None;
-
-    enable_raw_mode().unwrap();
-
-    // let backend = CrosstermBackend::new(stdout);
-    // let mut terminal = Terminal::new(backend).unwrap();
-    let mut stdout = stdout();
-
-    'gameloop: loop {
-        // stdout.execute(Clear(ClearType::All)).unwrap();
-        stdout.execute(&game).unwrap();
-        stdout.execute(Print("\n\n")).unwrap();
-
-        if game.lost() {
-            break 'gameloop;
-        }
-
-        let dir = match read().unwrap() {
-            Event::Key(k) => match (k.code, k.modifiers) {
-                (KeyCode::Left, KeyModifiers::NONE) => Direction::Left,
-                (KeyCode::Right, KeyModifiers::NONE) => Direction::Right,
-                (KeyCode::Up, KeyModifiers::NONE) => Direction::Up,
-                (KeyCode::Down, KeyModifiers::NONE) => Direction::Down,
-                (KeyCode::Char('u'), KeyModifiers::NONE) => {
-                    if let Some(prev) = prev_state.take() {
-                        game = prev;
-                    }
-                    continue 'gameloop;
-                }
-                (KeyCode::Char('c'), KeyModifiers::CONTROL) => break 'gameloop,
-                _ => {
-                    println!("{:?}", k);
-                    continue 'gameloop;
-                }
-            },
-            ev => {
-                println!("{:?}", ev);
-                continue 'gameloop;
-            }
-        };
-
-        if game.can_move(dir) {
-            prev_state = Some(game.clone());
-            game.do_move(dir);
-            game.spawn_tile();
-        }
-    }
-
-    disable_raw_mode().unwrap();
 }
 
 #[cfg(test)]
