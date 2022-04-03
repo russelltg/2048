@@ -6,6 +6,7 @@ enum Action {
     Move(Direction),
     TouchStart(TouchEvent),
     TouchEnd(TouchEvent),
+    NewGame,
     Undo,
 }
 
@@ -64,6 +65,11 @@ impl Component for Model {
 
                 false
             }
+            Action::NewGame => {
+                self.gs = GameState::new_from_entropy();
+                self.prev = self.gs.clone();
+                true
+            }
             Action::TouchEnd(_) => todo!(),
         }
     }
@@ -95,18 +101,25 @@ impl Component for Model {
                 "ArrowDown" => Some(Direction::Down.into()),
                 "ArrowUp" => Some(Direction::Up.into()),
                 "KeyU" => Some(Action::Undo),
+                "KeyN" => Some(Action::NewGame),
                 _ => None,
             }
         });
 
         let ontouchstart = link.callback(|e: TouchEvent| Action::TouchStart(e));
 
+        let lost = self.gs.lost();
+
         html! {
             <div ref={self.container.clone()} class="container" tabindex="0" onkeydown={onkeydown} ontouchstart={ontouchstart}>
-                <table class="game" >
-                    { for rows }
-                </table>
+                <span class="game">
+                    <table>
+                        { for rows }
+                    </table>
+                    { if lost { html! { <span class="lost_banner">{ "you lost" }</span> } } else { "".into() } }
+                </span>
                 <button onclick={link.callback(|_| Action::Undo)}>{ "Undo" }</button>
+                <button onclick={link.callback(|_| Action::NewGame)}>{ "New Game" }</button>
             </div>
         }
     }
