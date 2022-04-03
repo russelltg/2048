@@ -11,6 +11,9 @@ body {
     height: calc(100% - 5px);
     outline: 0;
     margin: 5px;
+    color: white;
+    font-size: 25px;
+    font-family: 'BIZ UDPMincho', serif;
 }
 
 .game {
@@ -42,41 +45,41 @@ body {
 }
 
 .value_1 {
-    background-color: #cecabe;
+    background-color: #14406b;
 }
 
 .value_2 {
-    background-color: #b4a578;
+    background-color: #5777cf;
 }
 
 .value_3 {
-    background-color: #ac8b76;
+    background-color: #3c99c4;
 }
 
 .value_4 {
-    background-color: #ac9e76;
+    background-color: #257a7a;
 }
 
 .value_5 {
-    background-color: #ac9076;
+    background-color: #4e2aa1;
 }
 
 .value_5 {
-    background-color: #ac8576;
+    background-color: #8d418d;
 }
 
 .value_6 {
-    background-color: #fdff7b;
+    background-color: #bd5da0;
 }
 
 .value_7 {
-    background-color: #ffdc7b;
+    background-color: #e9088b;
 }
 
 .value_7 {
-    background-color: #ffca7b;
+    background-color: #a70b0b;
 }
 
 .value_8 {
-    background-color: #ffb67b;
+    background-color: #5f0b43;
 }
