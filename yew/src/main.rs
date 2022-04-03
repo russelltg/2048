@@ -118,8 +118,8 @@ impl Component for Model {
                     </table>
                     { if lost { html! { <span class="lost_banner">{ "you lost" }</span> } } else { "".into() } }
                 </span>
-                <button onclick={link.callback(|_| Action::Undo)}>{ "Undo" }</button>
-                <button onclick={link.callback(|_| Action::NewGame)}>{ "New Game" }</button>
+                <button onclick={link.callback(|_| Action::Undo)}>{ "Undo (u)" }</button>
+                <button onclick={link.callback(|_| Action::NewGame)}>{ "New Game (n)" }</button>
             </div>
         }
     }

@@ -6,6 +6,18 @@ body {
     bottom: 100%;
 }
 
+button {
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #000;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 0.5em;
+    margin-right: 5px;
+}
+
 .container {
     width: calc(100% - 5px);
     height: calc(100% - 5px);
@@ -26,7 +38,7 @@ body {
     z-index: 1;
 }
 
-.game {
+.game table {
     border-radius: 5px;
     border-collapse: collapse;
     margin-bottom: 5px;
@@ -85,6 +97,35 @@ body {
     background-color: #a70b0b;
 }
 
+// 256
 .value_8 {
-    background-color: #5f0b43;
+    background-color: #320b5f;
+}
+
+.value_9 {
+    background-color: #0b5f5b;
+}
+
+.value_10 {
+    background-color: #0b5f16;
+}
+
+.value_11 {
+    background-color: #3f5f0b;
+}
+
+.value_12 {
+    background-color: #5f3d0b;
+}
+
+.value_13 {
+    background-color: #5f230b;
+}
+
+.value_14 {
+    background-color: #5f0b0b;
+}
+
+.value_15 {
+    background-color: #5f0b0b;
 }
