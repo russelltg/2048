@@ -1,0 +1,3 @@
+[build]
+public_url = "/twenty_48/"
+dist = "../docs"
