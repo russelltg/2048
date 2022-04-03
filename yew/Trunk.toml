@@ -1,3 +1,3 @@
 [build]
-public_url = "/twenty_48/"
+public_url = "/2048/"
 dist = "../docs"
