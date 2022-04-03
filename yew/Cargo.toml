@@ -10,3 +10,4 @@ yew = "0.19"
 twenty_48 = { path = "../twenty_48" }
 log = "0.4"
 wasm-logger = "0.2"
+web-sys = { version = "0.3", features = ["TouchList", "Touch"] }

@@ -1,11 +1,40 @@
+html,
+body {
+    left: 0%;
+    top: 0%;
+    right: 100%;
+    bottom: 100%;
+}
+
+.container {
+    width: calc(100% - 5px);
+    height: calc(100% - 5px);
+    outline: 0;
+    margin: 5px;
+}
+
+.game {
+    border: 1px solid rgb(143, 143, 143);
+    border-radius: 5px;
+    border-collapse: collapse;
+    margin-bottom: 5px;
+}
+
+.game tr td {
+    border: 1px solid rgb(143, 143, 143);
+    padding: 0;
+    margin: 0;
+}
+
 .game tr td div {
-    width: 50px;
-    height: 50px;
+    width: 130px;
+    height: 130px;
+    line-height: 130px;
     border-radius: 15px;
     // border: 1px solid black;
     text-align: center;
     margin: auto;
-    padding: 2px;
+    margin: 2px;
 }
 
 .game tr td {
@@ -15,18 +44,23 @@
 .value_1 {
     background-color: #cecabe;
 }
+
 .value_2 {
-    background-color: #8b7945;
+    background-color: #b4a578;
 }
+
 .value_3 {
     background-color: #ac8b76;
 }
+
 .value_4 {
     background-color: #ac9e76;
 }
+
 .value_5 {
     background-color: #ac9076;
 }
+
 .value_5 {
     background-color: #ac8576;
 }

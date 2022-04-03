@@ -733,6 +733,7 @@ dependencies = [
  "log",
  "twenty_48",
  "wasm-logger",
+ "web-sys",
  "yew 0.19.3",
 ]
 

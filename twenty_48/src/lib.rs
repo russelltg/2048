@@ -293,7 +293,7 @@ impl Tile {
 
 impl Distribution<Tile> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Tile {
-        if rng.sample(rand::distributions::Bernoulli::new(0.2).unwrap()) {
+        if rng.sample(rand::distributions::Bernoulli::new(0.9).unwrap()) {
             Tile::TWO
         } else {
             Tile::FOUR
