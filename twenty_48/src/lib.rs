@@ -4,16 +4,17 @@ pub mod solvers;
 
 use std::{
     fmt::{self, Display},
-    io::{stdin, stdout, Read},
     num::NonZeroU32,
 };
 
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use rand_distr::{Distribution, Standard, Uniform};
 
-#[derive(Clone)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct GameState {
     nums: [Option<Tile>; 16],
+
+    #[serde(skip_serializing, skip_deserializing, default="StdRng::from_entropy")]
     rng: StdRng,
 }
 
@@ -270,7 +271,7 @@ impl Display for GameState {
 }
 
 // which power of two. NonZero because two is the lowest
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 // #[cfg_attr(feature = "yew", derive(yew::ImplicitClone))]
 pub struct Tile(NonZeroU32);
 

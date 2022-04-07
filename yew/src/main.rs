@@ -1,5 +1,5 @@
 use twenty_48::{Direction, GameState};
-use web_sys::HtmlElement;
+use web_sys::{HtmlElement, window};
 use yew::prelude::*;
 
 enum Action {
@@ -23,12 +23,23 @@ struct Model {
     touch_start: Option<(i32, i32)>,
 }
 
+impl Model {
+    fn save(&self) {
+        window().unwrap().local_storage().unwrap().unwrap().set_item("game", &serde_json::to_string(&self.gs).unwrap()).unwrap()
+    }
+}
+
 impl Component for Model {
     type Message = Action;
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        let gs = GameState::new_from_entropy();
+        let gs = if let Ok(Some(name)) = window().unwrap().local_storage().unwrap().unwrap().get_item("game") {
+            serde_json::from_str(&name).ok()
+        } else {
+            None
+        }.unwrap_or_else(|| GameState::new_from_entropy());
+
         Self {
             prev: gs.clone(),
             gs,
@@ -44,6 +55,7 @@ impl Component for Model {
                     self.prev = self.gs.clone();
                     self.gs.do_move(dir);
                     self.gs.spawn_tile();
+                    self.save();
                     true
                 } else {
                     false
@@ -51,6 +63,7 @@ impl Component for Model {
             }
             Action::Undo => {
                 self.gs = self.prev.clone();
+                self.save();
                 true
             }
             Action::TouchStart(ts) => {
@@ -68,6 +81,7 @@ impl Component for Model {
             Action::NewGame => {
                 self.gs = GameState::new_from_entropy();
                 self.prev = self.gs.clone();
+                self.save();
                 true
             }
             Action::TouchEnd(_) => todo!(),

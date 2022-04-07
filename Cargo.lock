@@ -551,6 +551,7 @@ dependencies = [
  "getrandom",
  "rand",
  "rand_distr",
+ "serde",
  "yew 0.19.3",
 ]
 
@@ -731,6 +732,7 @@ name = "yew"
 version = "0.1.0"
 dependencies = [
  "log",
+ "serde_json",
  "twenty_48",
  "wasm-logger",
  "web-sys",
