@@ -1,9 +1,21 @@
+html {
+    touch-action: none;
+}
+
 html,
 body {
     left: 0%;
     top: 0%;
     right: 100%;
     bottom: 100%;
+}
+
+body {
+    width: calc(100% - 5px);
+    height: calc(100% - 5px);
+    outline: 0;
+    margin: 5px;
+    font-family: 'BIZ UDPMincho', serif;
 }
 
 button {
@@ -19,11 +31,7 @@ button {
 }
 
 .container {
-    width: calc(100% - 5px);
-    height: calc(100% - 5px);
-    outline: 0;
-    margin: 5px;
-    font-family: 'BIZ UDPMincho', serif;
+    margin: 0 auto;
 }
 
 .lost_banner {
@@ -43,7 +51,7 @@ button {
     border-collapse: collapse;
     margin-bottom: 5px;
     color: white;
-    font-size: 35px;
+    font-size: 7em;
 }
 
 .game tr td {
@@ -53,9 +61,9 @@ button {
 }
 
 .game tr td div {
-    width: 130px;
-    height: 130px;
-    line-height: 130px;
+    width: 23vmin;
+    height: 23vmin;
+    line-height: 23vmin;
     border-radius: 15px;
     text-align: center;
     margin: 2px;

@@ -67,6 +67,7 @@ impl Component for Model {
                 true
             }
             Action::TouchStart(ts) => {
+                log::info!("touch start");
                 let tl = ts.touches();
                 if tl.length() != 1 {
                     return false;
@@ -84,7 +85,10 @@ impl Component for Model {
                 self.save();
                 true
             }
-            Action::TouchEnd(_) => todo!(),
+            Action::TouchEnd(_) => {
+                log::info!("touch end");
+                false
+            }
         }
     }
 
@@ -108,7 +112,6 @@ impl Component for Model {
         });
 
         let onkeydown = link.batch_callback(|e: KeyboardEvent| {
-            log::info!("ev={:?}", e);
             match e.code().as_str() {
                 "ArrowLeft" => Some(Direction::Left.into()),
                 "ArrowRight" => Some(Direction::Right.into()),
@@ -126,12 +129,12 @@ impl Component for Model {
 
         html! {
             <div ref={self.container.clone()} class="container" tabindex="0" onkeydown={onkeydown} ontouchstart={ontouchstart}>
-                <span class="game">
+                <div class="game">
                     <table>
                         { for rows }
                     </table>
                     { if lost { html! { <span class="lost_banner">{ "you lost" }</span> } } else { "".into() } }
-                </span>
+                </div>
                 <button onclick={link.callback(|_| Action::Undo)}>{ "Undo (u)" }</button>
                 <button onclick={link.callback(|_| Action::NewGame)}>{ "New Game (n)" }</button>
             </div>
