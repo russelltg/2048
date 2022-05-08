@@ -1,5 +1,3 @@
-use std::io::{stdin, Read};
-
 use crate::{Direction, GameState};
 
 pub fn solver_up_right_left_down(gs: &mut GameState) {
@@ -11,7 +9,6 @@ pub fn solver_up_right_left_down(gs: &mut GameState) {
             Direction::Down,
         ] {
             if gs.can_move(d) {
-                let gs_pre = gs.clone();
                 gs.do_move(d);
                 gs.spawn_tile();
                 break;
@@ -38,9 +35,7 @@ pub fn solver_snake(gs: &mut GameState) {
                 Direction::Left,
                 Direction::Down,
             ]
-        } else
-        /*if gs.can_move_row(2|3)*/
-        {
+        } else {
             [
                 Direction::Up,
                 Direction::Left,

@@ -1,7 +1,7 @@
 #![feature(int_log)]
 
 use std::{
-    fmt::{self, Display},
+    fmt::{self},
     io::{stdin, stdout, Read},
 };
 
@@ -113,7 +113,6 @@ fn solve(solver: fn(&mut GameState)) {
         scores.push(game.max());
 
         game.print();
-        let l = game.lost();
         println!(
             "{}",
             2.0_f64.powf(scores.iter().map(|i| i.log(2)).sum::<u32>() as f64 / scores.len() as f64)

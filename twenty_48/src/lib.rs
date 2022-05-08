@@ -14,7 +14,7 @@ use rand_distr::{Distribution, Standard, Uniform};
 pub struct GameState {
     nums: [Option<Tile>; 16],
 
-    #[serde(skip_serializing, skip_deserializing, default="StdRng::from_entropy")]
+    #[serde(skip_serializing, skip_deserializing, default = "StdRng::from_entropy")]
     rng: StdRng,
 }
 
@@ -129,9 +129,8 @@ impl GameState {
             for seekidx in 1..4 - perp_idx {
                 let n = (idx + seekidx * dperp) as usize;
                 if self.nums[n].is_some() {
-                    if self.nums[idx as usize] == self.nums[n] {
-                        return true;
-                    } else if self.nums[idx as usize].is_none() {
+                    if self.nums[idx as usize].is_none() || self.nums[idx as usize] == self.nums[n]
+                    {
                         return true;
                     } else {
                         break; // something in the way
@@ -264,7 +263,7 @@ impl Display for GameState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for row in self.rows().iter() {
             GameState::print_row(f, row)?;
-            write!(f, "|\n")?;
+            writeln!(f, "|")?;
         }
         Ok(())
     }
