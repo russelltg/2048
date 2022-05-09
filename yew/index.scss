@@ -1,9 +1,6 @@
 html {
     touch-action: none;
-}
-
-html,
-body {
+    background-color: #4d4d4d;
     left: 0%;
     top: 0%;
     right: 100%;
@@ -11,11 +8,7 @@ body {
 }
 
 body {
-    width: calc(100% - 5px);
-    height: calc(100% - 5px);
-    outline: 0;
-    margin: 5px;
-    font-family: 'BIZ UDPMincho', serif;
+    margin: 0px;
 }
 
 button {
@@ -24,14 +17,22 @@ button {
     border-radius: 5px;
     cursor: pointer;
     color: #000;
-    font-size: 1.2em;
+    font-size: 3vh;
     font-weight: bold;
     padding: 0.5em;
     margin-right: 5px;
 }
 
 .container {
-    margin: 0 auto;
+    // margin: 0 auto;
+    margin: 5px;
+    font-family: 'BIZ UDPMincho', serif;
+    height: 100vh;
+}
+
+.container:focus {
+    box-shadow: none;
+    outline: none;
 }
 
 .lost_banner {
@@ -47,11 +48,11 @@ button {
 }
 
 .game table {
-    border-radius: 5px;
     border-collapse: collapse;
     margin-bottom: 5px;
     color: white;
-    font-size: 7em;
+    font-size: 10vmin;
+    border-radius: 5px;
 }
 
 .game tr td {
@@ -60,13 +61,15 @@ button {
     margin: 0;
 }
 
+$celldim: calc(min((100vmin - 10px)/4 - 12px, (100vh - 120px)/4 - 12px));
+
 .game tr td div {
-    width: 23vmin;
-    height: 23vmin;
-    line-height: 23vmin;
-    border-radius: 15px;
+    width: $celldim;
+    height: $celldim;
+    line-height: $celldim;
+    border-radius: 3vmin;
     text-align: center;
-    margin: 2px;
+    margin: 5px;
 }
 
 .value_1 {

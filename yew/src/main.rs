@@ -1,11 +1,12 @@
 use twenty_48::{Direction, GameState};
-use web_sys::{HtmlElement, window};
+use web_sys::{window, HtmlElement};
 use yew::prelude::*;
 
 enum Action {
     Move(Direction),
     TouchStart(TouchEvent),
     TouchEnd(TouchEvent),
+    TouchMove(TouchEvent),
     NewGame,
     Undo,
 }
@@ -21,11 +22,19 @@ struct Model {
     gs: GameState,
     container: NodeRef,
     touch_start: Option<(i32, i32)>,
+
+    debug: String,
 }
 
 impl Model {
     fn save(&self) {
-        window().unwrap().local_storage().unwrap().unwrap().set_item("game", &serde_json::to_string(&self.gs).unwrap()).unwrap()
+        window()
+            .unwrap()
+            .local_storage()
+            .unwrap()
+            .unwrap()
+            .set_item("game", &serde_json::to_string(&self.gs).unwrap())
+            .unwrap()
     }
 }
 
@@ -34,21 +43,29 @@ impl Component for Model {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        let gs = if let Ok(Some(name)) = window().unwrap().local_storage().unwrap().unwrap().get_item("game") {
+        let gs = if let Ok(Some(name)) = window()
+            .unwrap()
+            .local_storage()
+            .unwrap()
+            .unwrap()
+            .get_item("game")
+        {
             serde_json::from_str(&name).ok()
         } else {
             None
-        }.unwrap_or_else(|| GameState::new_from_entropy());
+        }
+        .unwrap_or_else(|| GameState::new_from_entropy());
 
         Self {
             prev: gs.clone(),
             gs,
             container: NodeRef::default(),
             touch_start: None,
+            debug: String::new(),
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, dir: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, dir: Self::Message) -> bool {
         match dir {
             Action::Move(dir) => {
                 if self.gs.can_move(dir) {
@@ -67,7 +84,6 @@ impl Component for Model {
                 true
             }
             Action::TouchStart(ts) => {
-                log::info!("touch start");
                 let tl = ts.touches();
                 if tl.length() != 1 {
                     return false;
@@ -77,7 +93,7 @@ impl Component for Model {
 
                 self.touch_start = Some((t.client_x(), t.client_y()));
 
-                false
+                true
             }
             Action::NewGame => {
                 self.gs = GameState::new_from_entropy();
@@ -85,9 +101,39 @@ impl Component for Model {
                 self.save();
                 true
             }
+            Action::TouchMove(te) => {
+                let (x, y) = match self.touch_start {
+                    Some((x, y)) => (x, y),
+                    None => return false,
+                };
+
+                let t = te.touches().get(0).unwrap();
+                let dx = t.client_x() - x;
+                let dy = t.client_y() - y;
+
+                if dx.abs() > 100 && dy.abs() < 50 {
+                    ctx.link().send_message(Action::Move(if dx.is_negative() {
+                        Direction::Left
+                    } else {
+                        Direction::Right
+                    }));
+                    self.touch_start = None;
+                }
+                if dy.abs() > 100 && dx.abs() < 50 {
+                    ctx.link().send_message(Action::Move(if dy.is_negative() {
+                        Direction::Up
+                    } else {
+                        Direction::Down
+                    }));
+                    self.touch_start = None;
+                }
+
+                false
+            }
             Action::TouchEnd(_) => {
                 log::info!("touch end");
-                false
+                self.touch_start = None;
+                true
             }
         }
     }
@@ -111,24 +157,24 @@ impl Component for Model {
             }
         });
 
-        let onkeydown = link.batch_callback(|e: KeyboardEvent| {
-            match e.code().as_str() {
-                "ArrowLeft" => Some(Direction::Left.into()),
-                "ArrowRight" => Some(Direction::Right.into()),
-                "ArrowDown" => Some(Direction::Down.into()),
-                "ArrowUp" => Some(Direction::Up.into()),
-                "KeyU" => Some(Action::Undo),
-                "KeyN" => Some(Action::NewGame),
-                _ => None,
-            }
+        let onkeydown = link.batch_callback(|e: KeyboardEvent| match e.code().as_str() {
+            "ArrowLeft" => Some(Direction::Left.into()),
+            "ArrowRight" => Some(Direction::Right.into()),
+            "ArrowDown" => Some(Direction::Down.into()),
+            "ArrowUp" => Some(Direction::Up.into()),
+            "KeyU" => Some(Action::Undo),
+            "KeyN" => Some(Action::NewGame),
+            _ => None,
         });
 
         let ontouchstart = link.callback(|e: TouchEvent| Action::TouchStart(e));
+        let ontouchend = link.callback(|e: TouchEvent| Action::TouchEnd(e));
+        let ontouchmove = link.callback(|e: TouchEvent| Action::TouchMove(e));
 
         let lost = self.gs.lost();
 
         html! {
-            <div ref={self.container.clone()} class="container" tabindex="0" onkeydown={onkeydown} ontouchstart={ontouchstart}>
+            <div ref={self.container.clone()} class="container" tabindex="0" onkeydown={onkeydown} ontouchstart={ontouchstart} ontouchend={ontouchend} ontouchmove={ontouchmove}>
                 <div class="game">
                     <table>
                         { for rows }
@@ -137,6 +183,7 @@ impl Component for Model {
                 </div>
                 <button onclick={link.callback(|_| Action::Undo)}>{ "Undo (u)" }</button>
                 <button onclick={link.callback(|_| Action::NewGame)}>{ "New Game (n)" }</button>
+                <span>{self.debug.clone()}</span>
             </div>
         }
     }
