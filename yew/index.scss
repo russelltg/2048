@@ -13,21 +13,21 @@ body {
 
 button {
     background-color: #fff;
-    border: 1px solid #000;
-    border-radius: 5px;
+    border: 0.2vw solid #000;
+    border-radius: 1vw;
     cursor: pointer;
     color: #000;
-    font-size: 3vh;
+    font-size: 5vw;
     font-weight: bold;
-    padding: 0.5em;
-    margin-right: 5px;
+    padding: 1vw;
+    margin-right: 1vw;
 }
 
 .container {
     // margin: 0 auto;
-    margin: 5px;
+    margin: 1vh;
     font-family: 'BIZ UDPMincho', serif;
-    height: 100vh;
+    height: 98vh;
 }
 
 .container:focus {
@@ -49,19 +49,19 @@ button {
 
 .game table {
     border-collapse: collapse;
-    margin-bottom: 5px;
+    margin-bottom: 1vmin;
     color: white;
-    font-size: 10vmin;
-    border-radius: 5px;
+    font-size: 6vmin;
+    border-radius: 1vmin;
 }
 
 .game tr td {
-    border: 1px solid rgb(196, 196, 196);
+    border: 0.2vmin solid rgb(196, 196, 196);
     padding: 0;
     margin: 0;
 }
 
-$celldim: calc(min((100vmin - 10px)/4 - 12px, (100vh - 120px)/4 - 12px));
+$celldim: calc(min((100vmin - 2vh)/4 - 2vmin, (100vh - 11.4vw)/4 - 2vmin));
 
 .game tr td div {
     width: $celldim;
@@ -69,7 +69,7 @@ $celldim: calc(min((100vmin - 10px)/4 - 12px, (100vh - 120px)/4 - 12px));
     line-height: $celldim;
     border-radius: 3vmin;
     text-align: center;
-    margin: 5px;
+    margin: 1vmin;
 }
 
 .value_1 {
