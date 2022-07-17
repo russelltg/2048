@@ -1,3 +1,4 @@
 [build]
 public_url = "/2048/"
 dist = "../docs"
+release = true

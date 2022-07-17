@@ -1,2 +1,6 @@
 [workspace]
 members = ["twenty_48", "yew", "cli"]
+
+[profile.release]
+opt-level = "s"
+lto = "thin"

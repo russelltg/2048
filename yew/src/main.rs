@@ -71,7 +71,7 @@ impl Component for Model {
                 if self.gs.can_move(dir) {
                     self.prev = self.gs.clone();
                     self.gs.do_move(dir);
-                    self.gs.spawn_tile();
+                    self.gs.spawn_tile_with_dir(dir);
                     self.save();
                     true
                 } else {

@@ -47,7 +47,7 @@ pub fn solver_snake(gs: &mut GameState) {
         for d in priority {
             if gs.can_move(d) {
                 gs.do_move(d);
-                gs.spawn_tile();
+                gs.spawn_tile_with_dir(d);
                 break;
             }
         }

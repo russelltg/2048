@@ -97,7 +97,7 @@ fn play_interactive() {
         if game.can_move(dir) {
             prev_state = Some(game.clone());
             game.do_move(dir);
-            game.spawn_tile();
+            game.spawn_tile_with_dir(dir);
         }
     }
 

@@ -69,6 +69,24 @@ impl GameState {
         s
     }
 
+    pub fn spawn_tile_with_dir(&mut self, dir: Direction) {
+        let rolls = [
+            self.random_open_tile().unwrap(),
+            self.random_open_tile().unwrap(),
+            self.random_open_tile().unwrap(),
+            self.random_open_tile().unwrap(),
+        ];
+
+        let t = match dir {
+            Direction::Up => rolls[0],
+            Direction::Down => rolls[1],
+            Direction::Left => rolls[2],
+            Direction::Right => rolls[3],
+        };
+
+        self.nums[t] = Some(self.rng.gen())
+    }
+
     pub fn spawn_tile(&mut self) {
         let t = self.random_open_tile().unwrap();
         self.nums[t] = Some(self.rng.gen())
