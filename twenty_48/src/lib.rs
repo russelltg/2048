@@ -245,7 +245,7 @@ impl GameState {
         let mut nums = [None; 16];
         for (i, n) in arg.iter().enumerate() {
             if *n != -1 {
-                nums[i] = Some(Tile(NonZeroU32::new(n.checked_log2().unwrap()).unwrap()));
+                nums[i] = Some(Tile(NonZeroU32::new(n.checked_ilog2().unwrap()).unwrap()));
             }
         }
 
