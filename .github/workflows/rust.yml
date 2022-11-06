@@ -22,10 +22,10 @@ jobs:
       run: cargo test --verbose
     - name: Install trunk
       run: cargo install trunk
+    - name: Install wasm target
+      run: rustup target add wasm32-unknown-unknown
     - name: Publish
       run: cd yew && trunk --config release.toml build
-    - name: Install wasm stdlib
-      run: rustup target add wasm32-unknown-unknown
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v1
       with:
