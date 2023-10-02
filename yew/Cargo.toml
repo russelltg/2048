@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-yew = "0.19"
+yew = { version = "0.21", default-features = false, features = ["csr"] }
 twenty_48 = { path = "../twenty_48" }
 log = "0.4"
 wasm-logger = "0.2"

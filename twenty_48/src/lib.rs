@@ -1,4 +1,4 @@
-#![feature(const_option, int_log)]
+#![feature(const_option)]
 
 pub mod solvers;
 
@@ -289,7 +289,6 @@ impl Display for GameState {
 
 // which power of two. NonZero because two is the lowest
 #[derive(Copy, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-// #[cfg_attr(feature = "yew", derive(yew::ImplicitClone))]
 pub struct Tile(NonZeroU32);
 
 impl Tile {
