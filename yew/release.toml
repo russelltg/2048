@@ -1,4 +1,4 @@
 [build]
-public_url = "/2048/"
+public_url = "https://2048.russellty.com/"
 dist = "../deploy"
 release = true
