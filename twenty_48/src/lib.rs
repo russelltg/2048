@@ -35,19 +35,6 @@ impl Direction {
     ];
 }
 
-// first is coming from the direction that's being swpied in
-// like 1 2 3 4 swiped left would give 1 2 3 4
-fn movable<'a>(mut iter: impl Iterator<Item = &'a Option<Tile>>) -> bool {
-    let mut prev = iter.next().unwrap();
-    for cur in iter {
-        if prev.is_none() || *prev == *cur {
-            return true;
-        }
-        prev = cur;
-    }
-    return false;
-}
-
 impl GameState {
     pub fn new_from_seed(seed: u64) -> Self {
         Self::new(StdRng::seed_from_u64(seed))
@@ -105,7 +92,7 @@ impl GameState {
         ]
     }
 
-    fn cols(&self) -> [[Option<Tile>; 4]; 4] {
+    fn _cols(&self) -> [[Option<Tile>; 4]; 4] {
         [
             [self.nums[0], self.nums[1], self.nums[2], self.nums[3]],
             [self.nums[4], self.nums[5], self.nums[6], self.nums[7]],

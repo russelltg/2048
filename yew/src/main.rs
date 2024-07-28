@@ -5,7 +5,7 @@ use yew::prelude::*;
 enum Action {
     Move(Direction),
     TouchStart(TouchEvent),
-    TouchEnd(TouchEvent),
+    TouchEnd,
     TouchMove(TouchEvent),
     NewGame,
     Undo,
@@ -130,7 +130,7 @@ impl Component for Model {
 
                 false
             }
-            Action::TouchEnd(_) => {
+            Action::TouchEnd => {
                 log::info!("touch end");
                 self.touch_start = None;
                 true
@@ -168,7 +168,7 @@ impl Component for Model {
         });
 
         let ontouchstart = link.callback(|e: TouchEvent| Action::TouchStart(e));
-        let ontouchend = link.callback(|e: TouchEvent| Action::TouchEnd(e));
+        let ontouchend = link.callback(|_e: TouchEvent| Action::TouchEnd);
         let ontouchmove = link.callback(|e: TouchEvent| Action::TouchMove(e));
 
         let lost = self.gs.lost();
@@ -188,7 +188,7 @@ impl Component for Model {
         }
     }
 
-    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
+    fn rendered(&mut self, _ctx: &Context<Self>, _first_render: bool) {
         self.container
             .cast::<HtmlElement>()
             .unwrap()

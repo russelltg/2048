@@ -1,5 +1,3 @@
-#![feature(int_log)]
-
 use std::{
     fmt::{self},
     io::{stdin, stdout, Read},
