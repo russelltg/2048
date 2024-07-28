@@ -54,7 +54,7 @@ impl Component for Model {
         } else {
             None
         }
-        .unwrap_or_else(|| GameState::new_from_entropy());
+        .unwrap_or_else(GameState::new_from_entropy);
 
         Self {
             prev: gs.clone(),

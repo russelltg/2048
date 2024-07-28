@@ -61,7 +61,7 @@ fn play_interactive() {
 
     'gameloop: loop {
         // stdout.execute(Clear(ClearType::All)).unwrap();
-        stdout.execute(&GsCommand(&game)).unwrap();
+        stdout.execute(GsCommand(&game)).unwrap();
         stdout.execute(Print("\n\n")).unwrap();
 
         if game.lost() {
@@ -115,7 +115,7 @@ fn solve(solver: fn(&mut GameState)) {
             "{}",
             2.0_f64.powf(scores.iter().map(|i| i.ilog(2)).sum::<u32>() as f64 / scores.len() as f64)
         );
-        stdin().read(&mut [0; 1024]).unwrap();
+        let _ = stdin().read(&mut [0; 1024]).unwrap(); // single read just to wait for input
     }
 }
 
