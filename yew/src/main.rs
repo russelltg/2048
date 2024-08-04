@@ -1,6 +1,6 @@
 use serde::de::DeserializeOwned;
 use twenty_48::{Direction, GameState};
-use web_sys::{js_sys::Date, window, HtmlDialogElement, HtmlElement, Node};
+use web_sys::{js_sys::Date, window, HtmlDialogElement, HtmlElement};
 use yew::prelude::*;
 
 enum Action {
