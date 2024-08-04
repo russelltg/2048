@@ -13,21 +13,28 @@ body {
 
 button {
     background-color: #fff;
-    border: 0.2vw solid #000;
-    border-radius: 1vw;
+    border: min(0.2vw, 0.2vh) solid #000;
+    border-radius: min(1vw, 1vh);
     cursor: pointer;
     color: #000;
-    font-size: 5vw;
+    font-size: min(4vw, 4vh);
     font-weight: bold;
-    padding: 1vw;
-    margin-right: 1vw;
+    padding: min(1vw, 1vh);
+    margin-right: min(1vw, 1vh);
 }
 
 .container {
     // margin: 0 auto;
-    margin: 1vh;
+    margin: min(1vh, 1vw);
     font-family: 'BIZ UDPMincho', serif;
     height: 98vh;
+}
+
+.score {
+    font-size: min(2vh, 2vw);
+    margin-top: min(1vh, 1vw);
+    margin-bottom: min(1vh, 1vw);
+    color: #e6e6e6;
 }
 
 .container:focus {

@@ -10,6 +10,7 @@ yew = { version = "0.21", default-features = false, features = ["csr"] }
 twenty_48 = { path = "../twenty_48" }
 log = "0.4"
 wasm-logger = "0.2"
-web-sys = { version = "0.3", features = ["TouchList", "Touch"] }
+web-sys = { version = "0.3", features = ["TouchList", "Touch", "HtmlDialogElement"] }
 serde_json = "1"
 wasm-bindgen = "0.2"
+serde = { version = "1.0.204", features = ["derive"] }

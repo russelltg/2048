@@ -101,16 +101,6 @@ impl GameState {
         ]
     }
 
-    // fn rows_mut(&mut self) -> [[&mut Option<Tile>; 3]; 3] {
-    //     let [a, b, c, d, e, f, g, h, i] = &mut self.nums;
-    //     [[a, b, c], [d, e, f], [g, h, i]]
-    // }
-
-    // fn cols_mut(&mut self) -> [[&mut Option<Tile>; 3]; 3] {
-    //     let [a, b, c, d, e, f, g, h, i] = &mut self.nums;
-    //     [[a, d, g], [b, e, h], [c, f, i]]
-    // }
-
     pub fn can_move_col(&self, column: i32) -> bool {
         self.can_move_colrow(column, Direction::Up) || self.can_move_colrow(column, Direction::Down)
     }
@@ -148,34 +138,6 @@ impl GameState {
 
     pub fn can_move(&self, direction: Direction) -> bool {
         (0..4).any(|colrow| self.can_move_colrow(colrow, direction))
-
-        // let (dperp, dpar, start): (i32, i32, i32) = match direction {
-        //     Direction::Up => (4, 1, 0),
-        //     Direction::Down => (-4, 1, 12),
-        //     Direction::Left => (1, 4, 0),
-        //     Direction::Right => (-1, 4, 3),
-        // };
-
-        // for par_idx in 0..4 {
-        //     let s = start + par_idx * dpar;
-        //     for perp_idx in 0..3 {
-        //         let idx = s + perp_idx * dperp;
-
-        //         for seekidx in 1..4 - perp_idx {
-        //             let n = (idx + seekidx * dperp) as usize;
-        //             if self.nums[n].is_some() {
-        //                 if self.nums[idx as usize] == self.nums[n] {
-        //                     return true;
-        //                 } else if self.nums[idx as usize].is_none() {
-        //                     return true;
-        //                 } else {
-        //                     break; // something in the way
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-        // false
     }
 
     pub fn do_move(&mut self, direction: Direction) {
@@ -261,6 +223,14 @@ impl GameState {
             }
         }
         Ok(())
+    }
+
+    pub fn score(&self) -> u64 {
+        self.nums
+            .iter()
+            .flatten()
+            .map(|t| u64::from(t.as_u32()))
+            .sum()
     }
 }
 

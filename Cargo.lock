@@ -1485,6 +1485,7 @@ name = "yew"
 version = "0.1.0"
 dependencies = [
  "log",
+ "serde",
  "serde_json",
  "twenty_48",
  "wasm-bindgen",

@@ -1,5 +1,6 @@
+use serde::de::DeserializeOwned;
 use twenty_48::{Direction, GameState};
-use web_sys::{window, HtmlElement};
+use web_sys::{js_sys::Date, window, HtmlDialogElement, HtmlElement, Node};
 use yew::prelude::*;
 
 enum Action {
@@ -9,6 +10,8 @@ enum Action {
     TouchMove(TouchEvent),
     NewGame,
     Undo,
+    OpenScoreboard,
+    CloseScoreboard,
 }
 
 impl From<Direction> for Action {
@@ -17,24 +20,40 @@ impl From<Direction> for Action {
     }
 }
 
+#[derive(Default, serde::Deserialize, serde::Serialize)]
+struct Scoreboard {
+    top: [Option<(u64, String)>; 5], // (score, date)
+}
+
 struct Model {
+    scoreboard: Scoreboard,
     prev: GameState,
     gs: GameState,
     container: NodeRef,
+    scoreboard_dialog: NodeRef,
     touch_start: Option<(i32, i32)>,
 
     debug: String,
 }
 
 impl Model {
+    const LS_KEY_GAME: &str = "game";
+    const LS_KEY_SCOREBOARD: &str = "scoreboard";
+
     fn save(&self) {
-        window()
-            .unwrap()
-            .local_storage()
-            .unwrap()
-            .unwrap()
-            .set_item("game", &serde_json::to_string(&self.gs).unwrap())
-            .unwrap()
+        let storage = &window().unwrap().local_storage().unwrap().unwrap();
+        storage
+            .set_item(
+                Model::LS_KEY_GAME,
+                &serde_json::to_string(&self.gs).unwrap(),
+            )
+            .unwrap();
+        storage
+            .set_item(
+                Model::LS_KEY_SCOREBOARD,
+                &serde_json::to_string(&self.scoreboard).unwrap(),
+            )
+            .unwrap();
     }
 }
 
@@ -43,23 +62,15 @@ impl Component for Model {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        let gs = if let Ok(Some(name)) = window()
-            .unwrap()
-            .local_storage()
-            .unwrap()
-            .unwrap()
-            .get_item("game")
-        {
-            serde_json::from_str(&name).ok()
-        } else {
-            None
-        }
-        .unwrap_or_else(GameState::new_from_entropy);
+        let gs = load_from_storage(Model::LS_KEY_GAME).unwrap_or_else(GameState::new_from_entropy);
+        let scoreboard = load_from_storage(Model::LS_KEY_SCOREBOARD).unwrap_or_default();
 
         Self {
             prev: gs.clone(),
             gs,
+            scoreboard,
             container: NodeRef::default(),
+            scoreboard_dialog: NodeRef::default(),
             touch_start: None,
             debug: String::new(),
         }
@@ -96,6 +107,7 @@ impl Component for Model {
                 true
             }
             Action::NewGame => {
+                self.scoreboard.add(self.gs.score());
                 self.gs = GameState::new_from_entropy();
                 self.prev = self.gs.clone();
                 self.save();
@@ -135,6 +147,21 @@ impl Component for Model {
                 self.touch_start = None;
                 true
             }
+            Action::OpenScoreboard => {
+                self.scoreboard_dialog
+                    .cast::<HtmlDialogElement>()
+                    .unwrap()
+                    .show_modal()
+                    .unwrap();
+                true
+            }
+            Action::CloseScoreboard => {
+                self.scoreboard_dialog
+                    .cast::<HtmlDialogElement>()
+                    .unwrap()
+                    .close();
+                true
+            }
         }
     }
 
@@ -154,6 +181,12 @@ impl Component for Model {
                         </td>
                     })}
                 </tr>
+            }
+        });
+
+        let scoreboard_rows = self.scoreboard.top.iter().flatten().map(|(score, date)| {
+            html! {
+                <tr><td>{score}</td><td>{date}</td></tr>
             }
         });
 
@@ -181,8 +214,18 @@ impl Component for Model {
                     </table>
                     { if lost { html! { <span class="lost_banner">{ "you lost" }</span> } } else { "".into() } }
                 </div>
+                <div class="score">
+                    { "Score: " } { self.gs.score() }
+                </div>
                 <button onclick={link.callback(|_| Action::Undo)}>{ "Undo (u)" }</button>
                 <button onclick={link.callback(|_| Action::NewGame)}>{ "New Game (n)" }</button>
+                <button onclick={link.callback(|_| Action::OpenScoreboard)}>{ "Scoreboard..." }</button>
+                <dialog ref={self.scoreboard_dialog.clone()} class="scoreboard">
+                    <table>
+                        { for scoreboard_rows }
+                    </table>
+                    <button autofocus=true onclick={link.callback(|_| Action::CloseScoreboard)}>{ "Close" }</button>
+                </dialog>
                 <span>{self.debug.clone()}</span>
             </div>
         }
@@ -194,6 +237,41 @@ impl Component for Model {
             .unwrap()
             .focus()
             .unwrap();
+    }
+}
+
+fn load_from_storage<T: DeserializeOwned>(key: &str) -> Option<T> {
+    if let Ok(Some(t)) = window()
+        .unwrap()
+        .local_storage()
+        .unwrap()
+        .unwrap()
+        .get_item(key)
+    {
+        serde_json::from_str(&t).ok()
+    } else {
+        None
+    }
+}
+
+impl Scoreboard {
+    fn add(&mut self, new_score: u64) {
+        for i in 0..self.top.len() {
+            if let Some((score, _)) = self.top[i] {
+                if new_score <= score {
+                    continue;
+                }
+            }
+
+            // this is a new high score, shift down and insert
+            self.top[i..].rotate_right(1);
+            self.top[i] = Some((
+                new_score,
+                Date::new_0().to_date_string().as_string().unwrap(),
+            ));
+
+            return;
+        }
     }
 }
 
