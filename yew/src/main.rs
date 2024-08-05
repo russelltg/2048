@@ -1,3 +1,4 @@
+use num_format::{Locale, ToFormattedString};
 use serde::de::DeserializeOwned;
 use twenty_48::{Direction, GameState};
 use web_sys::{js_sys::Date, window, HtmlDialogElement, HtmlElement};
@@ -23,6 +24,9 @@ impl From<Direction> for Action {
 #[derive(Default, serde::Deserialize, serde::Serialize)]
 struct Scoreboard {
     top: [Option<(u64, String)>; 5], // (score, date)
+
+    #[serde(default)]
+    lifetime_points: u64, // this was added later, so default is important
 }
 
 struct Model {
@@ -186,7 +190,7 @@ impl Component for Model {
 
         let scoreboard_rows = self.scoreboard.top.iter().flatten().map(|(score, date)| {
             html! {
-                <tr><td>{score}</td><td>{date}</td></tr>
+                <tr><td>{score.to_formatted_string(&Locale::en)}</td><td>{date}</td></tr>
             }
         });
 
@@ -205,6 +209,7 @@ impl Component for Model {
         let ontouchmove = link.callback(|e: TouchEvent| Action::TouchMove(e));
 
         let lost = self.gs.lost();
+        let score = self.gs.score();
 
         html! {
             <div ref={self.container.clone()} class="container" tabindex="0" onkeydown={onkeydown} ontouchstart={ontouchstart} ontouchend={ontouchend} ontouchmove={ontouchmove}>
@@ -215,7 +220,7 @@ impl Component for Model {
                     { if lost { html! { <span class="lost_banner">{ "you lost" }</span> } } else { "".into() } }
                 </div>
                 <div class="score">
-                    { "Score: " } { self.gs.score() }
+                    { "Score: " } { score.to_formatted_string(&Locale::en) }
                 </div>
                 <button onclick={link.callback(|_| Action::Undo)}>{ "Undo (u)" }</button>
                 <button onclick={link.callback(|_| Action::NewGame)}>{ "New Game (n)" }</button>
@@ -224,6 +229,9 @@ impl Component for Model {
                     <table>
                         { for scoreboard_rows }
                     </table>
+                    <div>
+                        { "Lifetime points: " } { (self.scoreboard.lifetime_points + score).to_formatted_string(&Locale::en) }
+                    </div>
                     <button autofocus=true onclick={link.callback(|_| Action::CloseScoreboard)}>{ "Close" }</button>
                 </dialog>
                 <span>{self.debug.clone()}</span>
@@ -256,6 +264,8 @@ fn load_from_storage<T: DeserializeOwned>(key: &str) -> Option<T> {
 
 impl Scoreboard {
     fn add(&mut self, new_score: u64) {
+        self.lifetime_points += new_score;
+
         for i in 0..self.top.len() {
             if let Some((score, _)) = self.top[i] {
                 if new_score <= score {
