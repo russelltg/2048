@@ -31,9 +31,9 @@ button {
 }
 
 .score {
-    font-size: min(2vh, 2vw);
-    margin-top: min(1vh, 1vw);
-    margin-bottom: min(1vh, 1vw);
+    font-size: 2vmin;
+    margin-top: 1vmin;
+    margin-bottom: 1vmin;
     color: #e6e6e6;
 }
 
@@ -68,7 +68,9 @@ button {
     margin: 0;
 }
 
-$celldim: calc(min((100vmin - 2vh)/4 - 2vmin, (100vh - 11.4vw)/4 - 2vmin));
+$buttons_height: 11.4vw;
+$score_height: 4vmin;
+$celldim: calc(min((100vmin - 2vh)/4 - 2vmin, (100vh - $buttons_height - $score_height)/4 - 2vmin));
 
 .game tr td div {
     width: $celldim;
@@ -77,6 +79,22 @@ $celldim: calc(min((100vmin - 2vh)/4 - 2vmin, (100vh - 11.4vw)/4 - 2vmin));
     border-radius: 3vmin;
     text-align: center;
     margin: 1vmin;
+}
+
+.hist-fill {
+    background-color: black;
+}
+
+
+.hist-header, .hist-footer {
+    writing-mode: vertical-lr;
+    min-width: 1em;
+}
+
+.histogram tr td {
+    padding: 0;
+    width: 1em;
+    height: 1em;
 }
 
 .value_1 {
