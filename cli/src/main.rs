@@ -113,7 +113,8 @@ fn solve(solver: fn(&mut GameState)) {
         game.print();
         println!(
             "{}",
-            2.0_f64.powf(scores.iter().map(|i| i.ilog(2)).sum::<u32>() as f64 / scores.len() as f64)
+            2.0_f64
+                .powf(scores.iter().map(|i| i.ilog(2)).sum::<u32>() as f64 / scores.len() as f64)
         );
         let _ = stdin().read(&mut [0; 1024]).unwrap(); // single read just to wait for input
     }
