@@ -1,5 +1,3 @@
-#![feature(const_option)]
-
 pub mod solvers;
 
 use std::{
