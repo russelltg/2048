@@ -6,7 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = { version = "0.8" }
-getrandom = { version = "0.2", features = ["js"] }
-rand_distr = "0.4"
+rand = { version = "0.9" }
+getrandom = "0.3"
+rand_distr = "0.5"
 serde = { version = "1", features = ["derive"] }
+

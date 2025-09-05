@@ -6,13 +6,13 @@ use std::{
 };
 
 use rand::{rngs::StdRng, Rng, SeedableRng};
-use rand_distr::{Distribution, Standard, Uniform};
+use rand_distr::{Bernoulli, Distribution, StandardUniform, Uniform};
 
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct GameState {
     nums: [Option<Tile>; 16],
 
-    #[serde(skip_serializing, skip_deserializing, default = "StdRng::from_entropy")]
+    #[serde(skip_serializing, skip_deserializing, default = "StdRng::from_os_rng")]
     rng: StdRng,
 }
 
@@ -39,7 +39,7 @@ impl GameState {
     }
 
     pub fn new_from_entropy() -> Self {
-        Self::new(StdRng::from_entropy())
+        Self::new(StdRng::from_os_rng())
     }
 
     fn new(rng: StdRng) -> Self {
@@ -69,12 +69,12 @@ impl GameState {
             Direction::Right => rolls[3],
         };
 
-        self.nums[t] = Some(self.rng.gen())
+        self.nums[t] = Some(self.rng.random())
     }
 
     pub fn spawn_tile(&mut self) {
         let t = self.random_open_tile().unwrap();
-        self.nums[t] = Some(self.rng.gen())
+        self.nums[t] = Some(self.rng.random())
     }
 
     pub fn lost(&self) -> bool {
@@ -181,7 +181,7 @@ impl GameState {
                     .iter()
                     .enumerate()
                     .filter(|(_, t)| t.is_none())
-                    .nth(self.rng.sample(Uniform::new(0, open_tiles)))
+                    .nth(self.rng.sample(Uniform::new(0, open_tiles).unwrap()))
                     .unwrap()
                     .0,
             )
@@ -198,7 +198,7 @@ impl GameState {
 
         Self {
             nums,
-            rng: StdRng::from_entropy(),
+            rng: StdRng::from_os_rng(),
         }
     }
 
@@ -263,9 +263,9 @@ impl Tile {
     }
 }
 
-impl Distribution<Tile> for Standard {
+impl Distribution<Tile> for StandardUniform {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Tile {
-        if rng.sample(rand::distributions::Bernoulli::new(0.9).unwrap()) {
+        if rng.sample(Bernoulli::new(0.9).unwrap()) {
             Tile::TWO
         } else {
             Tile::FOUR

@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 twenty_48 = { path = "../twenty_48" }
-crossterm = "0.28"
+crossterm = "0.29"
